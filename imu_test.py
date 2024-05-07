@@ -1,6 +1,6 @@
 import smbus
 import mpu9250 # 위에서 만든 코드를 import 해옵니다. 같은 경로에 위치하면 됩니다.
-import datetime
+from datatime import datetime
 
 # i2c 설정.
 # I2C 1번 bus를 엽니다. SDA1, SCL1이라 써져있는 핀을 사용하므로 1번 bus입니다.
