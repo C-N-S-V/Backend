@@ -19,8 +19,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setup I2C
         self.i2c = busio.I2C(board.SCL, board.SDA)
-        self.fxos = adafruit_fxos8700.FXOS8700(self.i2c, address=0x68)
-        self.fxas = adafruit_fxas21002c.FXAS21002C(self.i2c, address=0x68, gyro_range=adafruit_fxas21002c.GYRO_RANGE_2000DPS)
+        self.fxos = adafruit_fxos8700.FXOS8700(self.i2c, address=0x1F)
+        self.fxas = adafruit_fxas21002c.FXAS21002C(self.i2c, gyro_range=adafruit_fxas21002c.GYRO_RANGE_2000DPS)
 
         # Setup AHRS
         self.ahrs = imufusion.Ahrs()
