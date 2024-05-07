@@ -1,0 +1,64 @@
+import smbus
+import mpu9250  # Your MPU9250 code import
+from datetime import datetime
+
+# I2C setup
+i2c_bus = smbus.SMBus(1)  # SDA1 and SCL1 pins, so bus 1
+mpu9250 = mpu9250.MPU9250(i2c_bus, 0x68)  # IMU communication address
+
+# Initialize calibration and angle variables
+GyXSum = GyYSum = GyZSum = 0
+GyXOff = GyYOff = GyZOff = 0.0
+nSample = 1024  # Calibration sample count
+t_prev = 0  # Time tracking
+AngleX = AngleY = AngleZ = 0.0  # Accumulated angles
+
+cnt_loop = 0  # Loop count for periodic output
+
+try:
+    while True:
+        GyX, GyY, GyZ = mpu9250.read_gyro()  # Read all three axes
+
+        # Gyroscope calibration process
+        if nSample > 0:
+            GyXSum += GyX
+            GyYSum += GyY
+            GyZSum += GyZ
+            nSample -= 1
+            if nSample == 0:
+                GyXOff = GyXSum / 1024
+                GyYOff = GyYSum / 1024
+                GyZOff = GyZSum / 1024
+            continue
+
+        # Correct for offset
+        GyXD = GyX - GyXOff
+        GyYD = GyY - GyYOff
+        GyZD = GyZ - GyZOff
+
+        # Convert to degrees per second
+        GyXR = GyXD / 131
+        GyYR = GyYD / 131
+        GyZR = GyZD / 131
+
+        # Time tracking
+        t_now = datetime.now().microsecond
+        dt_n = t_now - t_prev
+        t_prev = t_now
+        dt = dt_n / 1000000
+
+        # Accumulate angles
+        AngleX += GyXR * dt
+        AngleY += GyYR * dt
+        AngleZ += GyZR * dt
+        cnt_loop += 1
+
+        # Print accumulated angles periodically
+        if cnt_loop % 50 != 0:
+            continue
+        print("AngleX = %.2f, AngleY = %.2f, AngleZ = %.2f" % (AngleX, AngleY, AngleZ))
+
+except KeyboardInterrupt:
+    pass
+
+i2c_bus.close()
