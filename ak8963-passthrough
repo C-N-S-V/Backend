@@ -1,0 +1,45 @@
+import time
+from mpu9250_jmdev.registers import *
+from mpu9250_jmdev.mpu_9250 import MPU9250
+
+# Create an MPU9250 instance with I2C address 0x68
+mpu = MPU9250(
+    address_ak=AK8963_ADDRESS,
+    address_mpu_master=MPU9050_ADDRESS_68,  # 0x68 address
+    address_mpu_slave=None,
+    bus=1,
+    gfs=GFS_1000,
+    afs=AFS_8G,
+    mfs=AK8963_BIT_16,
+    mode=AK8963_MODE_C100HZ
+)
+
+def enable_i2c_passthrough(mpu):
+    # Set USER_CTRL register to disable I2C master mode
+    mpu.writeMaster(MPU9250_USER_CTRL, 0x00)
+    
+    # Set INT_PIN_CFG to enable bypass mode
+    mpu.writeMaster(MPU9250_INT_PIN_CFG, 0x02)
+
+    print("I2C passthrough mode enabled.")
+
+# Configure the MPU9250
+mpu.configure()
+
+#Enable I2C passthrough mode
+enable_i2c_passhtrough(mpu)
+
+# Infinite loop to read and print sensor data
+while True:
+    # Read the accelerometer, gyroscope, and magnetometer data
+    accel_data = mpu.readAccelerometerMaster()
+    gyro_data = mpu.readGyroscopeMaster()
+    mag_data = mpu.readMagnetometerMaster()
+    
+    # Print the sensor values
+    print("Accelerometer:", accel_data)
+    print("Gyroscope:", gyro_data)
+    print("Magnetometer:", mag_data)
+    
+    # Wait for 1 second before the next reading
+    time.sleep(1)
