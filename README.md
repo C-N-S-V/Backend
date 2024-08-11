@@ -1,4 +1,4 @@
 # Backend
 백엔드
-RuntimeError: Failed to find FXOS8700, check wiring!
+라즈베리파이에서 데이터를 받아와 슬랙으로 전송하는 기능을 구현합니다
 >>> 
